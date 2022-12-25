@@ -20,6 +20,6 @@
     "require": {
         "php": "^7.0|^8.0",
         "ext-xlswriter": "^1.5.0",
-        "illuminate/support": "^7.0"
+        "illuminate/support": "^7.0||^8.0||^9.0"
     }
 }
