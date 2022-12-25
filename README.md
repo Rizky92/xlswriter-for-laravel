@@ -1,12 +1,16 @@
-## About
-Laravel wrapper package for php ext-xlswriter extension
+# About
+Laravel wrapper package for php ext-xlswriter extension.  
+  
+[![Latest Stable Version](http://poser.pugx.org/rizky92/laravel-xlswriter/v)](https://packagist.org/packages/rizky92/laravel-xlswriter)
+[![Total Downloads](http://poser.pugx.org/rizky92/laravel-xlswriter/downloads)](https://packagist.org/packages/rizky92/laravel-xlswriter)
+[![License](http://poser.pugx.org/rizky92/laravel-xlswriter/license)](https://packagist.org/packages/rizky92/laravel-xlswriter)
 
 ## Requirements
-- laravel 7+
-- ext-xlswriter 1.5.0+
+- [laravel 7+](https://laravel.com/docs/7.x/installation)
+- [ext-xlswriter 1.5.0+](https://pecl.php.net/package/xlswriter)
 
 ## Install
-### Via composer CLI
+#### Via composer CLI
 ```
 composer require rizky92/laravel-xlswriter
 ```
