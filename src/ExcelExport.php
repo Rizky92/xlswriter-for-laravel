@@ -70,12 +70,12 @@ class ExcelExport
      * Initialize a new object
      * 
      * @param  string $filename
-     * @param  string $sheetName = 'Sheet 1'
-     * @param  array<int|string,string> $config = []
+     * @param  string $sheetName
+     * @param  array<int|string,string> $config
      * 
      * @return self
      */
-    public function __construct($filename, $sheetName = 'Sheet 1', array $config = [])
+    public function __construct(string $filename, string $sheetName = 'Sheet 1', array $config = [])
     {
         $this->filename = Str::of($filename)
             ->ltrim('/')
@@ -97,7 +97,7 @@ class ExcelExport
     /**
      * Set the column headers to display for the cell data
      * 
-     * @param  array<int|string,string> $columnHeaders = []
+     * @param  array<int|string,string> $columnHeaders
      * 
      * @return self
      */
@@ -219,7 +219,7 @@ class ExcelExport
     }
 
     /** 
-     * Save excel to disk
+     * Save excel to disk and return its output path relative to storage
      * 
      * @return string
      */
@@ -259,7 +259,7 @@ class ExcelExport
      * 
      * @return static
      */
-    public static function make($filename, $sheetName = 'Sheet 1', array $config = [])
+    public static function make(string $filename, string $sheetName = 'Sheet 1', array $config = [])
     {
         return new static($filename, $sheetName, $config);
     }
