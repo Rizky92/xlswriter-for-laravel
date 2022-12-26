@@ -4,8 +4,8 @@ namespace Rizky92\Xlswriter;
 
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
-use Str;
-use Storage;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Vtiful\Kernel\Excel;
 
 class ExcelExport
@@ -60,11 +60,18 @@ class ExcelExport
     protected $basePath = 'excel';
 
     /**
-     * The disk used to export the excel
+     * The disk storage driver used to export the excel
      * 
      * @var string $disk
      */
     protected $disk = 'public';
+
+    /**
+     * The stored data instance
+     * 
+     * @var \Illuminate\Contracts\Support\Arrayable|array<int|string,mixed> $data
+     */
+    protected $data;
 
     /**
      * Initialize a new object
@@ -89,6 +96,8 @@ class ExcelExport
             ->remove('excel/');
 
         $this->basePath = $basePath;
+
+        $this->disk = $disk;
 
         $this->sheets[0] = $sheetName;
 
