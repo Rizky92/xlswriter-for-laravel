@@ -27,8 +27,7 @@ $excel = ExcelExport::make('users.xlsx', 'Sheet 1')
     ->setBasePath('excel/users')
     ->setDisk('public')
     ->setColumnHeaders($columnHeaders)
-    ->setData($users)
-    ->save();
+    ->setData($users);
 
 return $excel->export();
 ```
