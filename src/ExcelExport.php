@@ -71,22 +71,30 @@ class ExcelExport
      * 
      * @param  string $filename
      * @param  string $sheetName
+     * @param  string $basePath
+     * @param  string $disk
      * @param  array<int|string,string> $config
      * 
      * @return self
      */
-    public function __construct(string $filename, string $sheetName = 'Sheet 1', array $config = [])
-    {
+    public function __construct(
+        string $filename,
+        string $sheetName = 'Sheet 1',
+        string $basePath = 'excel/',
+        string $disk = 'public',
+        array $config = []
+    ) {
         $this->filename = Str::of($filename)
-            ->ltrim('/')
-            ->rtrim('/')
+            ->trim('/')
             ->remove('excel/');
+
+        $this->basePath = $basePath;
+
+        $this->sheets[0] = $sheetName;
 
         $this->config = empty($config)
             ? ['path' => Storage::disk($this->disk)->path($this->basePath)]
             : $config;
-
-        $this->sheets[0] = $sheetName;
 
         $this->excel = (new Excel($this->config))
             ->fileName($this->filename, $this->sheets[0]);
@@ -171,7 +179,7 @@ class ExcelExport
      */
     public function useSheet($sheetName)
     {
-        if (! in_array($sheetName, $this->sheets, true)) {
+        if (!in_array($sheetName, $this->sheets, true)) {
             throw new Exception("No sheets are available for sheet \"{$sheetName}\".");
         }
 
@@ -227,12 +235,12 @@ class ExcelExport
     {
         $exportedFilename = $this->basePath . '/' . $this->filename;
 
-        if (! Storage::disk($this->disk)->exists($exportedFilename)) {
+        if (!Storage::disk($this->disk)->exists($exportedFilename)) {
             $this->excel->output();
         }
 
         return $exportedFilename;
-    } 
+    }
 
     /**
      * Export excel to file as downloadable
@@ -243,7 +251,7 @@ class ExcelExport
     {
         $exportedFilename = $this->basePath . '/' . $this->filename;
 
-        if (! Storage::disk($this->disk)->exists($exportedFilename)) {
+        if (!Storage::disk($this->disk)->exists($exportedFilename)) {
             $this->excel->output();
         }
 
@@ -251,17 +259,24 @@ class ExcelExport
     }
 
     /**
-     * Create a new instance to generate excel
+     * Create a new instance
      * 
      * @param  string $filename
      * @param  string $sheetName
+     * @param  string $basePath
+     * @param  string $disk
      * @param  array<int|string,string> $config
      * 
      * @return static
      */
-    public static function make(string $filename, string $sheetName = 'Sheet 1', array $config = [])
-    {
-        return new static($filename, $sheetName, $config);
+    public static function make(
+        string $filename,
+        string $sheetName = 'Sheet 1',
+        string $basePath = 'excel/',
+        string $disk = 'public',
+        array $config = []
+    ) {
+        return new static($filename, $sheetName, $basePath, $disk, $config);
     }
 
     /**
