@@ -20,14 +20,14 @@ class ExcelExport
     /**
      * Array of columns for the data
      * 
-     * @var array<int|string,string> $columnHeaders
+     * @var array<int|string, string> $columnHeaders
      */
     protected $columnHeaders = [];
 
     /**
      * Array of titles for page header
      * 
-     * @var array<int,string> $pageHeaders
+     * @var array<int, string> $pageHeaders
      */
     protected $pageHeaders = [];
 
@@ -41,7 +41,7 @@ class ExcelExport
     /**
      * Array of configurations for excel instance
      * 
-     * @var array<int|string,string> $config
+     * @var array<int|string, string> $config
      */
     protected $config = [];
 
@@ -69,7 +69,7 @@ class ExcelExport
     /**
      * The stored data instance
      * 
-     * @var \Illuminate\Contracts\Support\Arrayable|array<int|string,mixed> $data
+     * @var \Illuminate\Contracts\Support\Arrayable|array<int|string, mixed> $data
      */
     protected $data;
 
