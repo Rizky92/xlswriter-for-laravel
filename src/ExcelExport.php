@@ -3,7 +3,7 @@
 namespace Rizky92\Xlswriter;
 
 use Exception;
-use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Vtiful\Kernel\Excel;
@@ -12,84 +12,67 @@ class ExcelExport
 {
     /**
      * The excel instance
-     * 
-     * @var \Vtiful\Kernel\Excel $excel
      */
-    protected $excel;
+    protected Excel $excel;
 
     /**
      * Array of columns for the data
      * 
-     * @var array<int|string, string> $columnHeaders
+     * @var string[]
      */
-    protected $columnHeaders = [];
+    protected array $columnHeaders = [];
 
     /**
      * Array of titles for page header
      * 
-     * @var array<int, string> $pageHeaders
+     * @var string[]
      */
-    protected $pageHeaders = [];
+    protected array $pageHeaders = [];
 
     /**
      * The exported excel file name
-     * 
-     * @var string $filename
      */
-    protected $filename;
+    protected string $filename;
 
     /**
      * Array of configurations for excel instance
      * 
-     * @var array<int|string, string> $config
+     * @var string[]
      */
-    protected $config = [];
+    protected array $config = [];
 
     /**
      * Array of sheet names for excel
      * 
-     * @var array<int,string> $sheets
+     * @var string[]
      */
-    protected $sheets = [];
+    protected array $sheets = [];
 
     /**
      * Base path for exported excel file
-     * 
-     * @var string $basePath
      */
-    protected $basePath = 'excel';
+    protected string $basePath = 'excel';
 
     /**
      * The disk storage driver used to export the excel
-     * 
-     * @var string $disk
      */
-    protected $disk = 'public';
+    protected string $disk = 'public';
 
     /**
      * The stored data instance
      * 
-     * @var \Illuminate\Contracts\Support\Arrayable|array<int|string, mixed> $data
+     * @var \Illuminate\Support\Collection<array-key, mixed>|array<array-key, mixed>
      */
     protected $data;
 
     /**
      * Initialize a new object
-     * 
-     * @param  string $filename
-     * @param  string $sheetName
-     * @param  string $basePath
-     * @param  string $disk
-     * @param  array<int|string,string> $config
-     * 
-     * @return self
      */
     public function __construct(
         string $filename,
         string $sheetName = 'Sheet 1',
         string $basePath = 'excel/',
-        string $disk = 'public',
-        array $config = []
+        string $disk = 'public'
     ) {
         $this->filename = Str::of($filename)
             ->trim('/')
@@ -101,24 +84,18 @@ class ExcelExport
 
         $this->sheets[0] = $sheetName;
 
-        $this->config = empty($config)
-            ? ['path' => Storage::disk($this->disk)->path($this->basePath)]
-            : $config;
+        $this->configure('path', Storage::disk($disk)->path($basePath));
 
         $this->excel = (new Excel($this->config))
             ->fileName($this->filename, $this->sheets[0]);
-
-        return $this;
     }
 
     /**
      * Set the column headers to display for the cell data
      * 
-     * @param  array<int|string,string> $columnHeaders
-     * 
-     * @return self
+     * @param  string[] $columnHeaders
      */
-    public function setColumnHeaders(array $columnHeaders = [])
+    public function setColumnHeaders(array $columnHeaders = []): self
     {
         $this->columnHeaders = $columnHeaders;
 
@@ -128,11 +105,9 @@ class ExcelExport
     /**
      * Set the page headers for the given sheet or all sheets
      * 
-     * @param  array<int,string> $pageHeaders = []
-     * 
-     * @return self
+     * @param  string[] $pageHeaders
      */
-    public function setPageHeaders(array $pageHeaders = [])
+    public function setPageHeaders(array $pageHeaders = []): self
     {
         $this->pageHeaders = $pageHeaders;
 
@@ -142,13 +117,11 @@ class ExcelExport
     /**
      * Set the type of data to be inserted to excel
      * 
-     * @param  \Illuminate\Contracts\Support\Arrayable|array<int|string,mixed> $data
-     * 
-     * @return self
+     * @param  \Illuminate\Support\Collection<array-key, mixed>|array<array-key, mixed> $data
      */
-    public function setData($data = [])
+    public function setData($data = []): self
     {
-        if ($data instanceof Arrayable) {
+        if ($data instanceof Collection) {
             $data = $data->toArray();
         }
 
@@ -162,14 +135,11 @@ class ExcelExport
 
     /**
      * Add a new sheet to excel
-     * 
-     * @param  string $sheetName
-     * 
-     * @return self
      */
-    public function addSheet($sheetName)
+    public function addSheet(string $sheetName): self
     {
-        $this->excel->addSheet($sheetName)
+        $this->excel
+            ->addSheet($sheetName)
             ->checkoutSheet($sheetName);
 
         $this->sheets = array_merge($this->sheets, [$sheetName]);
@@ -180,16 +150,15 @@ class ExcelExport
     /**
      * Use currently available sheets
      * 
-     * @param  string $sheetName
-     * 
-     * @return self
-     * 
      * @throws \Exception
      */
-    public function useSheet($sheetName)
+    public function useSheet(string $sheetName): self
     {
-        if (!in_array($sheetName, $this->sheets, true)) {
-            throw new Exception("No sheets are available for sheet \"{$sheetName}\".");
+        if (! in_array($sheetName, $this->sheets, true)) {
+            throw new Exception(sprintf(
+                'No sheets are available for sheet %s.',
+                [$sheetName]
+            ));
         }
 
         $this->excel->checkoutSheet($sheetName);
@@ -200,47 +169,41 @@ class ExcelExport
     /**
      * Get currently available sheets
      * 
-     * @return array<int,string>
+     * @return string[]
      */
-    public function getAvailableSheets()
+    public function getAvailableSheets(): array
     {
         return $this->sheets;
     }
 
     /**
      * Set the disk for excel export
-     * 
-     * @param  string $diskName
-     * 
-     * @return self
      */
-    public function setDisk($diskName = 'public')
+    public function setDisk(string $name = 'public'): self
     {
-        $this->disk = $diskName;
+        $this->disk = $name;
+
+        $this->configure('path', Storage::disk($this->disk)->path($this->basePath));
 
         return $this;
     }
 
     /**
      * Set the base path for the excel export
-     * 
-     * @param  string $basePath
-     * 
-     * @return self
      */
-    public function setBasePath($basePath = 'excel')
+    public function setBasePath(string $basePath = 'excel'): self
     {
         $this->basePath = $basePath;
+
+        $this->configure('path', Storage::disk($this->disk)->path($this->basePath));
 
         return $this;
     }
 
     /** 
      * Save excel to disk and return its output path relative to storage
-     * 
-     * @return string
      */
-    public function save()
+    public function save(): string
     {
         $exportedFilename = $this->basePath . '/' . $this->filename;
 
@@ -254,7 +217,7 @@ class ExcelExport
     /**
      * Export excel to file as downloadable
      * 
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return ?\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function export()
     {
@@ -274,7 +237,6 @@ class ExcelExport
      * @param  string $sheetName
      * @param  string $basePath
      * @param  string $disk
-     * @param  array<int|string,string> $config
      * 
      * @return static
      */
@@ -282,16 +244,20 @@ class ExcelExport
         string $filename,
         string $sheetName = 'Sheet 1',
         string $basePath = 'excel/',
-        string $disk = 'public',
-        array $config = []
+        string $disk = 'public'
     ) {
-        return new static($filename, $sheetName, $basePath, $disk, $config);
+        return new static($filename, $sheetName, $basePath, $disk);
+    }
+
+    protected function configure(string $key, $value): void
+    {
+        $this->config[$key] = $value;
     }
 
     /**
-     * @return void
+     * @throws \Exception
      */
-    protected function putColumnHeadersToCell()
+    protected function putColumnHeadersToCell(): void
     {
         if (empty($this->columnHeaders)) {
             throw new Exception("Cell column headers need to be set first!");
@@ -310,10 +276,7 @@ class ExcelExport
         $this->excel->insertText(count($this->pageHeaders) + 1, 0, '');
     }
 
-    /**
-     * @return void
-     */
-    protected function putPageHeadersToCell()
+    protected function putPageHeadersToCell(): void
     {
         if (empty($this->pageHeaders)) {
             return;
