@@ -1,5 +1,5 @@
 {
-    "name": "rizky92/laravel-xlswriter",
+    "name": "rizky92/xlswriter-for-laravel",
     "description": "Laravel wrapper package for php ext-xlswriter extension",
     "type": "library",
     "license": "MIT",
@@ -12,7 +12,7 @@
         {
             "name": "Rizky92",
             "email": "myquinn489@gmail.com",
-            "homepage": "https://github.com/rizky92/laravel-xlswriter"
+            "homepage": "https://github.com/rizky92/xlswriter-for-laravel"
         }
     ],
     "minimum-stability": "dev",
