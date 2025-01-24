@@ -3,9 +3,11 @@
 namespace Rizky92\Xlswriter;
 
 use Exception;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use Vtiful\Kernel\Excel;
 
 class ExcelExport
@@ -93,7 +95,7 @@ class ExcelExport
     /**
      * Set the column headers to display for the cell data
      * 
-     * @param  string[] $columnHeaders
+     * @param  string[]  $columnHeaders
      */
     public function setColumnHeaders(array $columnHeaders = []): self
     {
@@ -105,7 +107,7 @@ class ExcelExport
     /**
      * Set the page headers for the given sheet or all sheets
      * 
-     * @param  string[] $pageHeaders
+     * @param  string[]  $pageHeaders
      */
     public function setPageHeaders(array $pageHeaders = []): self
     {
@@ -117,18 +119,24 @@ class ExcelExport
     /**
      * Set the type of data to be inserted to excel
      * 
-     * @param  \Illuminate\Support\Collection<array-key, mixed>|array<array-key, mixed> $data
+     * @param  \Illuminate\Support\LazyCollection<array-key, mixed>|\Illuminate\Support\Collection<array-key, mixed>|array<array-key, mixed>  $data
      */
     public function setData($data = []): self
     {
-        if ($data instanceof Collection) {
-            $data = $data->toArray();
-        }
-
         $this->putColumnHeadersToCell();
         $this->putPageHeadersToCell();
 
-        $this->excel->data($data);
+        if ($data instanceof LazyCollection) {
+            foreach ($data as $item) {
+                if ($item instanceof Arrayable) {
+                    $this->excel->data([$item->toArray()]);
+                } else {
+                    $this->excel->data([$item]);
+                }
+            }
+        } else if ($data instanceof Collection) {
+            $this->excel->data($data->toArray());
+        }
 
         return $this;
     }
@@ -217,7 +225,7 @@ class ExcelExport
     /**
      * Export excel to file as downloadable
      * 
-     * @return ?\Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|null
      */
     public function export()
     {
@@ -233,11 +241,10 @@ class ExcelExport
     /**
      * Create a new instance
      * 
-     * @param  string $filename
-     * @param  string $sheetName
-     * @param  string $basePath
-     * @param  string $disk
-     * 
+     * @param  string  $filename
+     * @param  string  $sheetName
+     * @param  string  $basePath
+     * @param  string  $disk
      * @return static
      */
     public static function make(
