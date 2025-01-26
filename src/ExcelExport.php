@@ -4,7 +4,6 @@ namespace Rizky92\Xlswriter;
 
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
@@ -134,8 +133,10 @@ class ExcelExport
                     $this->excel->data([$item]);
                 }
             }
-        } else if ($data instanceof Collection) {
+        } else if ($data instanceof Arrayable) {
             $this->excel->data($data->toArray());
+        } else {
+            $this->excel->data($data);
         }
 
         return $this;
